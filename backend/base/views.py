@@ -7,6 +7,7 @@ from .serializers import ProductSerializer
 
 @api_view(['GET'])
 def getRouters(request):
+
     return Response('Hello')
 
 
