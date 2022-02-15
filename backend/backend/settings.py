@@ -38,7 +38,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',
-
+    'rest_framework_simplejwt',
     'base',
 ]
 
@@ -140,3 +140,12 @@ CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:8000',
     'http://192.168.1.47:3001',
 ]
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+
+}
