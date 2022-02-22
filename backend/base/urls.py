@@ -7,4 +7,6 @@ urlpatterns = [
     path('product/<str:pk>/', getProduct, name='product'),
     path('users/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
 
+
+    path('users/profile/', getUserProfile, name='users-profile')
 ]
