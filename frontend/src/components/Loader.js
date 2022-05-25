@@ -1,6 +1,5 @@
 import React from "react";
 import { Spinner } from "react-bootstrap";
-import HomeScreen from "../screens/HomeScreen";
 
 function Loader() {
     return (
