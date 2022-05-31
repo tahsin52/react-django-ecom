@@ -19,9 +19,10 @@ export const login = (email, password) => async (dispatch) => {
         dispatch({
             type: USER_LOGIN_REQUEST
         })
+
         const config = {
             headers: {
-                'Content-type': 'application/json',
+                'Content-type': 'application/json'
             }
         }
 
@@ -30,7 +31,6 @@ export const login = (email, password) => async (dispatch) => {
             { 'username': email, 'password': password },
             config
         )
-
 
         dispatch({
             type: USER_LOGIN_SUCCESS,
@@ -49,6 +49,11 @@ export const login = (email, password) => async (dispatch) => {
     }
 }
 
+
+export const logout = () => (dispatch) => {
+    localStorage.removeItem('userInfo')
+    dispatch({ type: USER_LOGOUT })
+}
 
 
 export const register = (name, email, password) => async (dispatch) => {
@@ -89,14 +94,6 @@ export const register = (name, email, password) => async (dispatch) => {
                 : error.message,
         })
     }
-}
-
-
-
-
-export const logout = () => (dispatch) => {
-    localStorage.removeItem('userInfo')
-    dispatch({type: USER_LOGOUT})
 }
 
 

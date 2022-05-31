@@ -1,12 +1,13 @@
 import React from 'react'
 import { useDispatch, useSelector } from "react-redux";
-import {Navbar, Nav, Container, NavDropdown} from 'react-bootstrap'
+import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'
 import { LinkContainer } from "react-router-bootstrap";
-import {logout} from "../actions/userActions";
-import { login } from "../actions/userActions";
+import { logout } from "../actions/userActions";
 
 
 function Header() {
+
+    const userLocal = localStorage.getItem('userInfo')
 
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
@@ -26,8 +27,7 @@ function Header() {
                     </LinkContainer>
 
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-
+                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="ml-auto">
 
                             <LinkContainer to='/cart'>
@@ -66,8 +66,6 @@ function Header() {
 
                                 </NavDropdown>
                             )}
-
-
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
