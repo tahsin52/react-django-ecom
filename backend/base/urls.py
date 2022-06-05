@@ -14,4 +14,6 @@ urlpatterns = [
     path('users/', getUsers, name='users'),
 
     path('users/register/', registerUser, name='register'),
+
+    path('orders/add/', addOrderItems, name='orders-add'),
 ]

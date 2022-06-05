@@ -53,7 +53,7 @@ class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
 class OrderItem(models.Model):
@@ -68,7 +68,7 @@ class OrderItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.product.name
 
 
 class ShippingAddress(models.Model):
@@ -82,4 +82,4 @@ class ShippingAddress(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.order)
+        return self.order.user.username
