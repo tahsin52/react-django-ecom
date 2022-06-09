@@ -16,5 +16,5 @@ urlpatterns = [
     path('users/register/', registerUser, name='register'),
 
     path('orders/add/', addOrderItems, name='orders-add'),
-    path('orders/<str:pk>', getOrderById, name='user-order'),
+    path('orders/<str:pk>/', getOrderById, name='user-order'),
 ]
