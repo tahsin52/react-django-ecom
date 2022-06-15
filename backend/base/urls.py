@@ -17,4 +17,5 @@ urlpatterns = [
 
     path('orders/add/', addOrderItems, name='orders-add'),
     path('orders/<str:pk>/', getOrderById, name='user-order'),
+    path('orders/<str:pk>/pay/', updateOrderPaid, name='pay'),
 ]
