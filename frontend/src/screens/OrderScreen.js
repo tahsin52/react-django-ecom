@@ -1,34 +1,72 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { Link} from "react-router-dom";
+import { PayPalButton } from "react-paypal-button-v2";
 import { useDispatch, useSelector } from 'react-redux'
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { getOrderDetails } from "../actions/orderActions";
+import { getOrderDetails, payOrder } from "../actions/orderActions";
+import {ORDER_PAY_RESET} from "../constants/orderConstants";
 
-
-function OrderScreen({ match }) {
-
+function OrderScreen({ match, history }) {
     const orderId = match.params.id
-    const dispatch = useDispatch();
+    const dispatch = useDispatch()
 
+    const [sdkReady, setSdkReady] = useState(false)
 
     const orderDetails = useSelector(state => state.orderDetails)
-    const { error, loading, order } = orderDetails
+    const { order, error, loading } = orderDetails
 
-    if(!loading && !error ){
+    const orderPay = useSelector(state => state.orderPay)
+    const { loading: loadingPay, success: successPay } = orderPay
+
+
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+
+    if (!loading && !error) {
         order.itemsPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0).toFixed(2)
     }
 
-    useEffect(() => {
-        if(!order || order._id !== Number(orderId)){
-            dispatch(getOrderDetails(orderId))
+
+    const addPayPalScript = () => {
+        const script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.src = 'https://www.paypal.com/sdk/js?client-id=AeDXja18CkwFUkL-HQPySbzZsiTrN52cG13mf9Yz7KiV2vNnGfTDP0wDEN9sGlhZHrbb_USawcJzVDgn'
+        script.async = true
+        script.onload = () => {
+            setSdkReady(true)
         }
-    }, [order, orderId])
+        document.body.appendChild(script)
+    }
+
+    useEffect(() => {
+
+        if (!userInfo) {
+            history.push('/login')
+        }
+
+        if (!order || successPay || order._id !== Number(orderId)) {
+            dispatch({ type: ORDER_PAY_RESET })
+            dispatch(getOrderDetails(orderId))
+        } else if (!order.isPaid) {
+            if (!window.paypal) {
+                addPayPalScript()
+            } else {
+                setSdkReady(true)
+            }
+        }
+    }, [dispatch, order, orderId, successPay])
+
+
+    const successPaymentHandler = (paymentResult) => {
+        dispatch(payOrder(orderId, paymentResult))
+    }
 
     return loading ? (
         <Loader />
-    ): error ? (
+    ) : error ? (
         <Message variant='danger'>{error}</Message>
     ): (
         <div>
@@ -97,17 +135,16 @@ function OrderScreen({ match }) {
                     </ListGroup>
                 </Col>
 
-                <Col md={4}>
-                    <Card>
-                        <ListGroup variant={"flush"}>
-                            <ListGroup.Item>
-                                <h2>Order Summary</h2>
-                            </ListGroup.Item>
-                        </ListGroup>
+                        <Col md={4}>
+                            <Card>
+                                <ListGroup variant='flush'>
+                                    <ListGroup.Item>
+                                        <h2>Order Summary</h2>
+                                    </ListGroup.Item>
 
                         <ListGroup.Item>
                                 <Row>
-                                    <Col>Item:</Col>
+                                    <Col>Items:</Col>
                                     <Col>$ {order.itemsPrice}</Col>
                                 </Row>
                         </ListGroup.Item>
@@ -119,24 +156,42 @@ function OrderScreen({ match }) {
                                 </Row>
                         </ListGroup.Item>
 
-                        <ListGroup.Item>
-                                <Row>
-                                    <Col>Tax:</Col>
-                                    <Col>$ {order.taxPrice}</Col>
-                                </Row>
-                        </ListGroup.Item>
+                                    <ListGroup.Item>
+                                        <Row>
+                                            <Col>Tax:</Col>
+                                            <Col>${order.taxPrice}</Col>
+                                        </Row>
+                                    </ListGroup.Item>
 
-                        <ListGroup.Item>
-                                <Row>
-                                    <Col>Total:</Col>
-                                    <Col>$ {order.totalPrice}</Col>
-                                </Row>
-                        </ListGroup.Item>
-                    </Card>
-                </Col>
-            </Row>
-        </div>
-    )
+                                    <ListGroup.Item>
+                                        <Row>
+                                            <Col>Total:</Col>
+                                            <Col>${order.totalPrice}</Col>
+                                        </Row>
+                                    </ListGroup.Item>
+
+
+                                    {!order.isPaid && (
+                                        <ListGroup.Item>
+                                            {loadingPay && <Loader />}
+
+                                            {!sdkReady ? (
+                                                <Loader />
+                                            ) : (
+                                                    <PayPalButton
+                                                        amount={order.totalPrice}
+                                                        onSuccess={successPaymentHandler}
+                                                    />
+                                                )}
+                                        </ListGroup.Item>
+                                    )}
+                                </ListGroup>
+
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+            )
 }
 
 export default OrderScreen
